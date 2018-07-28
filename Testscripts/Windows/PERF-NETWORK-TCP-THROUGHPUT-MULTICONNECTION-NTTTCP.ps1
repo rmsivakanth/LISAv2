@@ -128,7 +128,7 @@ collect_VM_properties
 		$ntttcpReportLog = Get-Content -Path "$LogDir\report.log"
 		foreach ( $line in $ntttcpReportLog )
 		{
-            if ( $line -imatch "test_connections" )
+            if ( $line -imatch "TestConnections" )
             {
                 continue;
             }

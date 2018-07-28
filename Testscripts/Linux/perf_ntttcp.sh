@@ -248,6 +248,7 @@ InstallNTTTCP ${server}
 LogMsg "Now running NTTTCP test"
 runNtttcp
 
+column -s, -t $result_file > ./$log_folder/report.log
 ssh root@${client} "cp ntttcp-test-logs/* ."
-column -s, -t $result_file
+cat report.log
 UpdateTestState ICA_TESTCOMPLETED
