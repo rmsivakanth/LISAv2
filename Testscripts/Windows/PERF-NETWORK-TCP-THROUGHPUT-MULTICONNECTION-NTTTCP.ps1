@@ -122,7 +122,7 @@ collect_VM_properties
 		RemoteCopy -downloadFrom $clientVMData.PublicIP -port $clientVMData.SSHPort -username "root" -password $password -download -downloadTo $LogDir -files "dstat-sender-p*"
 		RemoteCopy -downloadFrom $clientVMData.PublicIP -port $clientVMData.SSHPort -username "root" -password $password -download -downloadTo $LogDir -files "sar-sender-p*"
 		RemoteCopy -downloadFrom $clientVMData.PublicIP -port $clientVMData.SSHPort -username "root" -password $password -download -downloadTo $LogDir -files "report.log"
-		RemoteCopy -downloadFrom $clientVMData.PublicIP -port $clientVMData.SSHPort -username "root" -password $password -download -downloadTo $LogDir -files "VM_properties.csv"
+		RemoteCopy -downloadFrom $clientVMData.PublicIP -port $clientVMData.SSHPort -username "root" -password $password -download -downloadTo $LogDir -files "*.csv"
 		
 		$testSummary = $null
 		$ntttcpReportLog = Get-Content -Path "$LogDir\report.log"
@@ -179,6 +179,7 @@ collect_VM_properties
 		
 		LogMsg "Test Completed"
 		
+		$ntttcpDataCsv = Import-Csv -Path $LogDir\report.csv
 		LogMsg "Uploading the test results.."
 		$dataSource = $xmlConfig.config.$TestPlatform.database.server
 		$user = $xmlConfig.config.$TestPlatform.database.user
@@ -241,6 +242,7 @@ collect_VM_properties
 			LogMsg "Invalid database details. Failed to upload result to database!"
 		}
 		LogMsg "Test result : $testResult"
+		LogMsg ($ntttcpDataCsv | Format-Table | Out-String)
 	}
 	catch
 	{
