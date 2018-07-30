@@ -162,27 +162,27 @@ runNtttcp()
 			LogMsg "Test running in ${testType} mode"
 			txlogFile="${testType}-${bufferLength}-sender-p${num_threads_P}X${num_threads_n}.log"
 			rxlogFile="${testType}-${bufferLength}-receiver-p${num_threads_P}X${num_threads_n}.log"
-            serverNTTTCPCmd="ulimit -n 204800 && ntttcp -P ${num_threads_P} -t ${testDuration} -e -u -b ${bufferLength}"
+			serverNTTTCPCmd="ulimit -n 204800 && ntttcp -P ${num_threads_P} -t ${testDuration} -e -u -b ${bufferLength}"
 			clientNTTTCPCmd="ntttcp -s${server} -P ${num_threads_P} -n ${num_threads_n} -t ${testDuration} -u -b ${bufferLength}"
 		else
 			LogMsg "Test running in ${testType} mode"
 			txlogFile="${testType}-sender-p${num_threads_P}X${num_threads_n}.log"
 			rxlogFile="${testType}-receiver-p${num_threads_P}X${num_threads_n}.log"
-            serverNTTTCPCmd="ulimit -n 204800 && ntttcp -P ${num_threads_P} -t ${testDuration} -e"
-            clientNTTTCPCmd="ntttcp -s${server} -P ${num_threads_P} -n ${num_threads_n} -t ${testDuration}"
-            ssh ${server} "for i in {1..$testDuration}; do ss -ta | grep ESTA | grep -v ssh | wc -l >> ./$log_folder/tcp-connections-p${num_threads_P}X${num_threads_n}.log; sleep 1; done" &
+			serverNTTTCPCmd="ulimit -n 204800 && ntttcp -P ${num_threads_P} -t ${testDuration} -e"
+			clientNTTTCPCmd="ntttcp -s${server} -P ${num_threads_P} -n ${num_threads_n} -t ${testDuration}"
+			ssh ${server} "for i in {1..$testDuration}; do ss -ta | grep ESTA | grep -v ssh | wc -l >> ./$log_folder/tcp-connections-p${num_threads_P}X${num_threads_n}.log; sleep 1; done" &
 		fi
         
-        tx_ntttcp_log_file="$log_folder/ntttcp-${txlogFile}"
-        tx_lagscope_log_file="$log_folder/lagscope-${txlogFile}"
-        rx_ntttcp_log_file="$log_folder/ntttcp-${rxlogFile}"
+		tx_ntttcp_log_file="$log_folder/ntttcp-${txlogFile}"
+		tx_lagscope_log_file="$log_folder/lagscope-${txlogFile}"
+		rx_ntttcp_log_file="$log_folder/ntttcp-${rxlogFile}"
 
-        ssh ${server} "pkill -f ntttcp"
-        LogMsg "$serverNTTTCPCmd > ./$log_folder/ntttcp-${rxlogFile}"
-        ssh ${server} "${serverNTTTCPCmd}" > "./$log_folder/ntttcp-${rxlogFile}" &
+		ssh ${server} "pkill -f ntttcp"
+		LogMsg "$serverNTTTCPCmd > ./$log_folder/ntttcp-${rxlogFile}"
+		ssh ${server} "${serverNTTTCPCmd}" > "./$log_folder/ntttcp-${rxlogFile}" &
 
 		ssh ${server} "pkill -f lagscope"
-        ssh ${server} "lagscope -r" &
+		ssh ${server} "lagscope -r" &
 
 		ssh ${server} "pkill -f dstat"
 		ssh ${server} "dstat -dam" > "./$log_folder/dstat-${rxlogFile}" &
@@ -196,11 +196,11 @@ runNtttcp()
 		dstat -dam > "./$log_folder/dstat-${txlogFile}" &
 		mpstat -P ALL 1 ${testDuration} > "./$log_folder/mpstat-${txlogFile}" &
 		lagscope -s${server} -t ${testDuration} -V > "./$log_folder/lagscope-${txlogFile}" &
-        LogMsg "${clientNTTTCPCmd} > ./${log_folder}/ntttcp-${txlogFile}"
-        $clientNTTTCPCmd > "./${log_folder}/ntttcp-${txlogFile}"
+		LogMsg "${clientNTTTCPCmd} > ./${log_folder}/ntttcp-${txlogFile}"
+		$clientNTTTCPCmd > "./${log_folder}/ntttcp-${txlogFile}"
 
 		LogMsg "Parsing results for $current_test_threads connections"
-        sleep 10
+		sleep 10
 		txThroughput=$(cat $tx_ntttcp_log_file | grep throughput | tail -1 | tr ":" " " | awk '{ print $NF }')
 		if [[ $txThroughput =~ "Gbps" ]];
 		then
@@ -212,7 +212,7 @@ runNtttcp()
 			LogMsg "throughput in $txThroughput"
 		fi
 
-        rxThroughput=$(cat $rx_ntttcp_log_file | grep throughput | tail -1 | tr ":" " " | awk '{ print $NF }')
+		rxThroughput=$(cat $rx_ntttcp_log_file | grep throughput | tail -1 | tr ":" " " | awk '{ print $NF }')
 		if [[ $rxThroughput =~ "Gbps" ]];
 		then
 			rxThroughput=$(echo $rxThroughput | sed 's/Gbps//')
@@ -225,7 +225,7 @@ runNtttcp()
 
 		txCyclesperbytes=$(cat $tx_ntttcp_log_file | grep cycles/byte | tr ":" " " | awk '{ print $NF }')
 		Avglatency=$(cat $tx_lagscope_log_file | grep Average | sed 's/.* //' | sed 's/us//')
-        rxCyclesperbytes=$(cat $rx_ntttcp_log_file | grep cycles/byte | tr ":" " " | awk '{ print $NF }')
+		rxCyclesperbytes=$(cat $rx_ntttcp_log_file | grep cycles/byte | tr ":" " " | awk '{ print $NF }')
 	
 		LogMsg "Throughput in Gbps : TX : $txThroughput : RX : $rxThroughput"
 		LogMsg "Cycles/Byte : TX: $txCyclesperbytes : RX: $rxCyclesperbytes"
