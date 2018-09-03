@@ -65,6 +65,9 @@ function Main {
         Add-Content -Value "nicName=$nicName" -Path $constantsFile
         foreach ($param in $currentTestData.TestParameters.param) {
             Add-Content -Value "$param" -Path $constantsFile
+            if ($param -imatch "bufferLength=") {
+                $testBuffer = "$($param.Replace('bufferLength=','')/1024)"+"k"
+            }
         }
         LogMsg "constanst.sh created successfully..."
         LogMsg (Get-Content -Path $constantsFile)
@@ -112,9 +115,9 @@ collect_VM_properties
                 if ($CurrentTestData.testName -imatch "udp") {
                     $testType = "UDP"
                     $test_connections = $line.Trim().Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Split(" ")[0]
-                    $tx_throughput_gbps = $line.Trim().Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Split(" ")[2]
-                    $rx_throughput_gbps = $line.Trim().Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Split(" ")[3]
-                    $datagram_loss = $line.Trim().Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Split(" ")[4]
+                    $tx_throughput_gbps = $line.Trim().Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Split(" ")[1]
+                    $rx_throughput_gbps = $line.Trim().Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Split(" ")[2]
+                    $datagram_loss = $line.Trim().Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Split(" ")[3]
                     $tx_cycle_per_byte = $line.Trim().Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Split(" ")[5]
                     $rx_cycle_per_byte = $line.Trim().Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Split(" ")[6]
                     $average_latency = $line.Trim().Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Replace("  "," ").Split(" ")[7]
@@ -158,6 +161,7 @@ collect_VM_properties
         }
         
         $ntttcpDataCsv = Import-Csv -Path $LogDir\report.csv
+        LogMsg $CurrentTestData.testName
         LogMsg ($ntttcpDataCsv | Format-Table * | Out-String)
         
         LogMsg "Uploading the test results.."
@@ -189,7 +193,7 @@ collect_VM_properties
                 $SQLQuery = "INSERT INTO $dataTableName (TestCaseName,TestDate,HostType,HostBy,HostOS,GuestOSType,GuestDistro,GuestSize,KernelVersion,IPVersion,ProtocolType,DataPath,SendBufSize_KBytes,NumberOfConnections,TxThroughput_Gbps,RxThroughput_Gbps,DatagramLoss) VALUES "
                 for ($i = 1; $i -lt $LogContents.Count; $i++) {
                     $Line = $LogContents[$i].Trim() -split '\s+'
-                    $SQLQuery += "('$TestCaseName','$(Get-Date -Format yyyy-MM-dd)','$HostType','$HostBy','$HostOS','$GuestOSType','$GuestDistro','$GuestSize','$KernelVersion','$IPVersion','$ProtocolType','$DataPath',$($Line[1]),$($Line[0]),$($Line[2]),$($Line[3],$($Line[4]))),"
+                    $SQLQuery += "('$TestCaseName','$(Get-Date -Format yyyy-MM-dd)','$HostType','$HostBy','$HostOS','$GuestOSType','$GuestDistro','$GuestSize','$KernelVersion','$IPVersion','$ProtocolType','$DataPath','$testBuffer',$($Line[0]),$($Line[1]),$($Line[2],$($Line[3]))),"
                 }
             } else {
                 $SQLQuery = "INSERT INTO $dataTableName (TestCaseName,TestDate,HostType,HostBy,HostOS,GuestOSType,GuestDistro,GuestSize,KernelVersion,IPVersion,ProtocolType,DataPath,NumberOfConnections,Throughput_Gbps,Latency_ms) VALUES "

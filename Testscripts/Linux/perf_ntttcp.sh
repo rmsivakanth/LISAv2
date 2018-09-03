@@ -169,7 +169,7 @@ Run_Ntttcp()
 	if [[ $testType == "udp" ]];
 	then
 		bufferLength=$(($bufferLength/1024))
-		echo "test_connections,buffer_length_KB,tx_throughput_in_Gbps,rx_throughput_in_Gbps,datagram_loss_in_%" > $result_file
+		echo "test_connections,tx_throughput_in_Gbps,rx_throughput_in_Gbps,datagram_loss_in_%" > $result_file
 		ssh ${server} "sysctl -w net.core.rmem_max=67108864; sysctl -w net.core.rmem_default=67108864; sysctl -w net.core.wmem_default=67108864; sysctl -w net.core.wmem_max=67108864"
 		ssh ${client} "sysctl -w net.core.rmem_max=67108864; sysctl -w net.core.rmem_default=67108864; sysctl -w net.core.wmem_default=67108864; sysctl -w net.core.wmem_max=67108864"
 	else
@@ -253,7 +253,7 @@ Run_Ntttcp()
 		
 		if [[ $testType == "udp" ]];
 		then
-			echo "$current_test_threads,$bufferLength,$tx_throughput,$rx_throughput,$data_loss" >> $result_file
+			echo "$current_test_threads,$tx_throughput,$rx_throughput,$data_loss" >> $result_file
 		else
 		testType="tcp"
 			echo "$current_test_threads,$tx_throughput,$tx_cyclesperbytes,$avg_latency" >> $result_file
