@@ -158,7 +158,7 @@ collect_VM_properties
         }
         
         $ntttcpDataCsv = Import-Csv -Path $LogDir\report.csv
-        LogMsg ($ntttcpDataCsv | Format-Table | Out-String)
+        LogMsg ($ntttcpDataCsv | Format-Table * | Out-String)
         
         LogMsg "Uploading the test results.."
         $dataSource = $xmlConfig.config.$TestPlatform.database.server
