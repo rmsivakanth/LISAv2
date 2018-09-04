@@ -192,14 +192,14 @@ Run_Ntttcp()
 			tx_log_prefix="sender-${testType}-${bufferLength}k-p${num_threads_P}X${num_threads_n}.log"
 			rx_log_prefix="receiver-${testType}-${bufferLength}k-p${num_threads_P}X${num_threads_n}.log"
 			run_msg="Running ${testType} ${bufferLength}k Test: $current_test_threads connections : $num_threads_P X $num_threads_n"
-			server_ntttcp_cmd="ulimit -n 204800 && ntttcp -u -b ${bufferLength}k -P ${num_threads_P} -t ${testDuration} -e"
-			client_ntttcp_cmd="ntttcp -s${server} -u -b ${bufferLength}k -P ${num_threads_P} -n ${num_threads_n} -t ${testDuration}"
+			server_ntttcp_cmd="ulimit -n 204800 && ntttcp -u -b ${bufferLength}k -P ${num_threads_P} -t ${testDuration} -e -W 1 -C 1"
+			client_ntttcp_cmd="ntttcp -s${server} -u -b ${bufferLength}k -P ${num_threads_P} -n ${num_threads_n} -t ${testDuration} -W 1 -C 1"
 		else
 			tx_log_prefix="sender-${testType}-p${num_threads_P}X${num_threads_n}.log"
 			rx_log_prefix="receiver-${testType}-p${num_threads_P}X${num_threads_n}.log"
 			run_msg="Running ${testType} Test: $current_test_threads connections : $num_threads_P X $num_threads_n"
-			server_ntttcp_cmd="ulimit -n 204800 && ntttcp -P ${num_threads_P} -t ${testDuration} -e"
-			client_ntttcp_cmd="ntttcp -s${server} -P ${num_threads_P} -n ${num_threads_n} -t ${testDuration}"
+			server_ntttcp_cmd="ulimit -n 204800 && ntttcp -P ${num_threads_P} -t ${testDuration} -e -W 1 -C 1"
+			client_ntttcp_cmd="ntttcp -s${server} -P ${num_threads_P} -n ${num_threads_n} -t ${testDuration} -W 1 -C 1"
 			ssh ${server} "for i in {1..$testDuration}; do ss -ta | grep ESTA | grep -v ssh | wc -l >> ./$log_folder/tcp-connections-p${num_threads_P}X${num_threads_n}.log; sleep 1; done" &
 
 		fi

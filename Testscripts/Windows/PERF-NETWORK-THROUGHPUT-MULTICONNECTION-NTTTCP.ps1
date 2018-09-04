@@ -66,7 +66,7 @@ function Main {
         foreach ($param in $currentTestData.TestParameters.param) {
             Add-Content -Value "$param" -Path $constantsFile
             if ($param -imatch "bufferLength=") {
-                $testBuffer = "$($param.Replace('bufferLength=','')/1024)"+"k"
+                $testBuffer = $($param.Replace('bufferLength=','')/1024)
             }
         }
         LogMsg "constanst.sh created successfully..."
@@ -161,8 +161,8 @@ collect_VM_properties
         }
         
         $ntttcpDataCsv = Import-Csv -Path $LogDir\report.csv
-        LogMsg $CurrentTestData.testName
-        LogMsg ($ntttcpDataCsv | Format-Table * | Out-String)
+        LogMsg ("`n**************************************************************************`n"+$CurrentTestData.testName+" RESULTS...`n**************************************************************************")
+        Write-Host ($ntttcpDataCsv | Format-Table * | Out-String)
         
         LogMsg "Uploading the test results.."
         $dataSource = $xmlConfig.config.$TestPlatform.database.server
@@ -189,11 +189,11 @@ collect_VM_properties
             $ProtocolType = $testType
             $connectionString = "Server=$dataSource;uid=$user; pwd=$password;Database=$database;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
             $LogContents = Get-Content -Path "$LogDir\report.log"
-            if ( $testType = "UDP" ) {
+            if ( $testType -imatch "UDP" ) {
                 $SQLQuery = "INSERT INTO $dataTableName (TestCaseName,TestDate,HostType,HostBy,HostOS,GuestOSType,GuestDistro,GuestSize,KernelVersion,IPVersion,ProtocolType,DataPath,SendBufSize_KBytes,NumberOfConnections,TxThroughput_Gbps,RxThroughput_Gbps,DatagramLoss) VALUES "
                 for ($i = 1; $i -lt $LogContents.Count; $i++) {
                     $Line = $LogContents[$i].Trim() -split '\s+'
-                    $SQLQuery += "('$TestCaseName','$(Get-Date -Format yyyy-MM-dd)','$HostType','$HostBy','$HostOS','$GuestOSType','$GuestDistro','$GuestSize','$KernelVersion','$IPVersion','$ProtocolType','$DataPath','$testBuffer',$($Line[0]),$($Line[1]),$($Line[2],$($Line[3]))),"
+                    $SQLQuery += "('$TestCaseName','$(Get-Date -Format yyyy-MM-dd)','$HostType','$HostBy','$HostOS','$GuestOSType','$GuestDistro','$GuestSize','$KernelVersion','$IPVersion','$ProtocolType','$DataPath','$testBuffer',$($Line[0]),$($Line[1]),$($Line[2]),$($Line[3])),"
                 }
             } else {
                 $SQLQuery = "INSERT INTO $dataTableName (TestCaseName,TestDate,HostType,HostBy,HostOS,GuestOSType,GuestDistro,GuestSize,KernelVersion,IPVersion,ProtocolType,DataPath,NumberOfConnections,Throughput_Gbps,Latency_ms) VALUES "
