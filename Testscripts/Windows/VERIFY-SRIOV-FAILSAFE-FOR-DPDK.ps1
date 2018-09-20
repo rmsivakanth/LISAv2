@@ -42,7 +42,7 @@ function Main {
     # Create test result 
     $superUser = "root"
     $resultArr = @()
-	$lowerbound = 1000000
+    $lowerbound = 1000000
     try {
         $noClient = $true
         $noServer = $true
@@ -52,9 +52,11 @@ function Main {
                 $noClient = $false
             }
             elseif ($vmData.RoleName -imatch "server") {
-                $noServer = $fase
+                $noServer = $false
                 $serverVMData = $vmData
-            }
+			} else {
+				LogErr "VM role name is not matched with server or client"
+			}
         }
         if ($noClient) {
             Throw "No any master VM defined. Be sure that, Client VM role name matches with the pattern `"*master*`". Aborting Test."
@@ -211,7 +213,7 @@ collect_VM_properties
         $testResult = "FAIL"
     } finally {
         if (!$testResult) {
-            $testResult = "Aborted"
+            $testResult = "ABORTED"
         }
         $resultArr += $testResult
     }
