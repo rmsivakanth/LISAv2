@@ -54,9 +54,9 @@ function Main {
             elseif ($vmData.RoleName -imatch "server") {
                 $noServer = $false
                 $serverVMData = $vmData
-			} else {
-				LogErr "VM role name is not matched with server or client"
-			}
+            } else {
+                LogErr "VM role name is not matched with server or client"
+            }
         }
         if ($noClient) {
             Throw "No any master VM defined. Be sure that, Client VM role name matches with the pattern `"*master*`". Aborting Test."
@@ -140,7 +140,7 @@ collect_VM_properties
 			LogErr "Initial DPDK test execution failed"
 		}
 		$resultArr += $testResult
-		$currentTestResult.TestSummary +=  CreateResultSummary -testResult "$($initialSriovResult.DpdkVersion) : TxPPS : $($initialSriovResult.RxPps) : RxPPS : $($initialSriovResult.RxPps)" -metaData "DPDK-TESTPMD : Initial SRIOV" -checkValues "PASS,FAIL,ABORTED" -testName $currentTestData.testName
+		$currentTestResult.TestSummary +=  CreateResultSummary -testResult "$($initialSriovResult.DpdkVersion) : TxPPS : $($initialSriovResult.TxPps) : RxPPS : $($initialSriovResult.RxPps)" -metaData "DPDK-TESTPMD : Initial SRIOV" -checkValues "PASS,FAIL,ABORTED" -testName $currentTestData.testName
 		
         #disable SRIOV
         $sriovStatus = $false
@@ -164,7 +164,7 @@ collect_VM_properties
 			LogErr "Disable SRIOV is failed"
 		}
 		$resultArr += $testResult
-		$currentTestResult.TestSummary +=  CreateResultSummary -testResult "$($syntheticResult.DpdkVersion) : TxPPS : $($syntheticResult.RxPps) : RxPPS : $($syntheticResult.RxPps)" -metaData "DPDK-TESTPMD : Synthetic" -checkValues "PASS,FAIL,ABORTED" -testName $currentTestData.testName
+		$currentTestResult.TestSummary +=  CreateResultSummary -testResult "$($syntheticResult.DpdkVersion) : TxPPS : $($syntheticResult.TxPps) : RxPPS : $($syntheticResult.RxPps)" -metaData "DPDK-TESTPMD : Synthetic" -checkValues "PASS,FAIL,ABORTED" -testName $currentTestData.testName
 		
         #enable SRIOV
         $currentDir = "$LogDir\finallSRIOVTest"
@@ -187,7 +187,7 @@ collect_VM_properties
 			LogErr "Enable SRIOV is failed"
 		}
 		$resultArr += $testResult
-		$currentTestResult.TestSummary +=  CreateResultSummary -testResult "$($finalSriovResult.DpdkVersion) : TxPps : $($finalSriovResult.RxPps) : RxPps : $($finalSriovResult.RxPps)" -metaData "DPDK-TESTPMD : Re-Enable SRIOV" -checkValues "PASS,FAIL,ABORTED" -testName $currentTestData.testName
+		$currentTestResult.TestSummary +=  CreateResultSummary -testResult "$($finalSriovResult.DpdkVersion) : TxPps : $($finalSriovResult.TxPps) : RxPps : $($finalSriovResult.RxPps)" -metaData "DPDK-TESTPMD : Re-Enable SRIOV" -checkValues "PASS,FAIL,ABORTED" -testName $currentTestData.testName
 		LogMsg "Comparison of DPDK RxPPS between Initial and Re-Enabled SRIOV"
 		if (($null -ne $initialSriovResult.RxPps) -and ($null -ne $finalSriovResult.RxPps)) {
 			$loss = [Math]::Round([Math]::Abs($initialSriovResult.RxPps - $finalSriovResult.RxPps)/$initialSriovResult.RxPps*100, 2)
